@@ -147,7 +147,7 @@ RAW_INDEX_CO_SIO_TIMESTAMP = 0
 RAW_INDEX_CO_ID = 1
 RAW_INDEX_CO_TIME_OFFSET = 2
 
-INDUCTIVE_ID_KEY = 'inductive_id'
+PARSED_SERIAL_ID_KEY = 'parsed_serial_id'
 
 
 def convert_hex_ascii_to_int(int_val):
@@ -178,7 +178,7 @@ class DataParticleType(BaseEnum):
 
 class CtdmoInstrumentDataParticleKey(BaseEnum):
     CONTROLLER_TIMESTAMP = "sio_controller_timestamp"
-    INDUCTIVE_ID = "inductive_id"
+    PARSED_SERIAL_ID = "parsed_serial_id"
     SERIAL_NUMBER = "serial_number"
     TEMPERATURE = "temperature"
     CONDUCTIVITY = "conductivity"
@@ -220,7 +220,7 @@ class CtdmoGhqrRecoveredInstrumentDataParticle(DataParticle):
         #   time of science data
         #
         particle = [
-            self._encode_value(CtdmoInstrumentDataParticleKey.INDUCTIVE_ID,
+            self._encode_value(CtdmoInstrumentDataParticleKey.PARSED_SERIAL_ID,
                                self.raw_data[RAW_INDEX_REC_CT_ID], int),
             self._encode_value(CtdmoInstrumentDataParticleKey.SERIAL_NUMBER,
                                self.raw_data[RAW_INDEX_REC_CT_SERIAL], str),
@@ -287,7 +287,7 @@ class CtdmoGhqrSioTelemeteredInstrumentDataParticle(DataParticle):
             self._encode_value(CtdmoInstrumentDataParticleKey.CONTROLLER_TIMESTAMP,
                                self.raw_data[RAW_INDEX_TEL_CT_SIO_TIMESTAMP],
                                convert_hex_ascii_to_int),
-            self._encode_value(CtdmoInstrumentDataParticleKey.INDUCTIVE_ID,
+            self._encode_value(CtdmoInstrumentDataParticleKey.PARSED_SERIAL_ID,
                                struct.unpack('>B',
                                self.raw_data[RAW_INDEX_TEL_CT_ID])[0],
                                int),
@@ -310,7 +310,7 @@ class CtdmoGhqrSioTelemeteredInstrumentDataParticle(DataParticle):
 
 class CtdmoOffsetDataParticleKey(BaseEnum):
     CONTROLLER_TIMESTAMP = "sio_controller_timestamp"
-    INDUCTIVE_ID = "inductive_id"
+    PARSED_SERIAL_ID = "parsed_serial_id"
     CTD_OFFSET = "ctd_time_offset"
 
 
@@ -338,7 +338,7 @@ class CtdmoGhqrSioOffsetDataParticle(DataParticle):
             self._encode_value(CtdmoOffsetDataParticleKey.CONTROLLER_TIMESTAMP,
                                self.raw_data[RAW_INDEX_CO_SIO_TIMESTAMP],
                                convert_hex_ascii_to_int),
-            self._encode_value(CtdmoOffsetDataParticleKey.INDUCTIVE_ID,
+            self._encode_value(CtdmoOffsetDataParticleKey.PARSED_SERIAL_ID,
                                struct.unpack('>B', self.raw_data[RAW_INDEX_CO_ID])[0],
                                int),
             self._encode_value(CtdmoOffsetDataParticleKey.CTD_OFFSET,
@@ -388,7 +388,7 @@ def parse_co_data(particle_class, chunk, sio_header_timestamp, extract_sample):
             # The ID needs to be converted from a byte string to an integer
             # for the comparison.
             #
-            inductive_id = co_match.group(CO_GROUP_ID)
+            parsed_serial_id = co_match.group(CO_GROUP_ID)
             #
             # Generate the data particle.
             # Data stored for each particle is a tuple of the following:
@@ -396,7 +396,7 @@ def parse_co_data(particle_class, chunk, sio_header_timestamp, extract_sample):
             #   inductive ID (from chunk)
             #   Time Offset (from chunk)
             #
-            sample = extract_sample(particle_class, None, (sio_header_timestamp, inductive_id,
+            sample = extract_sample(particle_class, None, (sio_header_timestamp, parsed_serial_id,
                                     co_match.group(CO_GROUP_TIME_OFFSET)), None)
             if sample is not None:
                 #
@@ -492,8 +492,8 @@ class CtdmoGhqrRecoveredCtParser(SimpleParser):
         #
         # Verify that the required parameters are in the parser configuration.
         #
-        if not INDUCTIVE_ID_KEY in config:
-            raise DatasetParserException("Parser config is missing %s" % INDUCTIVE_ID_KEY)
+        if not PARSED_SERIAL_ID_KEY in config:
+            raise DatasetParserException("Parser config is missing %s" % PARSED_SERIAL_ID_KEY)
 
         #
         # File is ASCII with records separated by newlines.
@@ -587,7 +587,7 @@ class CtdmoGhqrRecoveredCtParser(SimpleParser):
             #   time of science data
             #
             sample = self._extract_sample(CtdmoGhqrRecoveredInstrumentDataParticle, None,
-                                         (self._config.get(INDUCTIVE_ID_KEY),
+                                         (self._config.get(PARSED_SERIAL_ID_KEY),
                                           self._serial_number,
                                           ct_match.group(REC_CT_GROUP_TEMPERATURE),
                                           ct_match.group(REC_CT_GROUP_CONDUCTIVITY),
