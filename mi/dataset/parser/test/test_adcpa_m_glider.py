@@ -18,7 +18,7 @@ import os
 from mi.core.log import get_logger
 log = get_logger()
 
-from mi.core.exceptions import RecoverableSampleException
+from mi.core.exceptions import RecoverableSampleException, UnexpectedDataException
 
 from mi.idk.config import Config
 from mi.dataset.test.test_parser import ParserUnitTestCase
@@ -134,8 +134,9 @@ class AdcpsMGliderParserUnitTestCase(ParserUnitTestCase):
 
             log.debug('Exceptions : %s', self.exception_callback_value[0])
 
-            self.assertEqual(len(self.exception_callback_value), 1)
+            self.assertEqual(len(self.exception_callback_value), 2)
             self.assert_(isinstance(self.exception_callback_value[0], RecoverableSampleException))
+            self.assert_(isinstance(self.exception_callback_value[1], UnexpectedDataException))
 
 
 def convert_yml(input_file):
