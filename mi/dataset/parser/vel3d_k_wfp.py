@@ -77,49 +77,49 @@ DATA_HEADER_CHECKSUM_LENGTH = (DATA_HEADER_SIZE / 2) - 1  # sum of 16-bit values
 # is added to the end of the list.
 #
 DATA_PAYLOAD_FORMAT = '<2bIh6B2HhIH2h7H7h2H2bI3h6b'
-INSTRUMENT_PARTICLE_KEYS = \
+INSTRUMENT_PARTICLE_MAP = \
     [
-        'vel3d_k_version',
-        None,                      # offsetOfData not included in particle
-        'vel3d_k_serial',
-        'vel3d_k_configuration',
-        'date_time_array',         # year, month, day, hour, minute, seconds
-        'vel3d_k_micro_second',
-        'vel3d_k_speed_sound',
-        'vel3d_k_temp_c',
-        'vel3d_k_pressure',
-        'vel3d_k_heading',
-        'vel3d_k_pitch',
-        'vel3d_k_roll',
-        'vel3d_k_error',
-        'vel3d_k_status',
-        'vel3d_k_beams_coordinate',
-        'vel3d_k_cell_size',
-        'vel3d_k_blanking',
-        'vel3d_k_velocity_range',
-        'vel3d_k_battery_voltage',
-        'vel3d_k_mag_x',
-        'vel3d_k_mag_y',
-        'vel3d_k_mag_z',
-        'vel3d_k_acc_x',
-        'vel3d_k_acc_y',
-        'vel3d_k_acc_z',
-        'vel3d_k_ambiguity',
-        'vel3d_k_data_set_description',
-        'vel3d_k_transmit_energy',
-        'vel3d_k_v_scale',
-        'vel3d_k_power_level',
-        None,                      # unused not included in particle
-        'vel3d_k_vel0',
-        'vel3d_k_vel1',
-        'vel3d_k_vel2',
-        'vel3d_k_amp0',
-        'vel3d_k_amp1',
-        'vel3d_k_amp2',
-        'vel3d_k_corr0',
-        'vel3d_k_corr1',
-        'vel3d_k_corr2',
-        'vel3d_k_id'
+        ('vel3d_k_version', 'b'),
+        (None, 'B'),                    # offsetOfData not included in particle
+        ('vel3d_k_serial', 'I'),
+        ('vel3d_k_configuration', 'H'),
+        ('date_time_array',      '6B'),   # year, month, day, hour, minute, seconds
+        ('vel3d_k_micro_second', 'H'),
+        ('vel3d_k_speed_sound', 'H'),
+        ('vel3d_k_temp_c', 'H'),
+        ('vel3d_k_pressure',  'I'),
+        ('vel3d_k_heading', 'H'),
+        ('vel3d_k_pitch', 'h'),
+        ('vel3d_k_roll', 'h'),
+        ('vel3d_k_error', 'H'),
+        ('vel3d_k_status', 'H'),
+        ('vel3d_k_beams_coordinate', 'H'),
+        ('vel3d_k_cell_size', 'H'),
+        ('vel3d_k_blanking', 'H'),
+        ('vel3d_k_velocity_range', 'H'),
+        ('vel3d_k_battery_voltage', 'H'),
+        ('vel3d_k_mag_x', 'h'),
+        ('vel3d_k_mag_y', 'h'),
+        ('vel3d_k_mag_z', 'h'),
+        ('vel3d_k_acc_x', 'h'),
+        ('vel3d_k_acc_y', 'h'),
+        ('vel3d_k_acc_z', 'h'),
+        ('vel3d_k_ambiguity', 'H'),
+        ('vel3d_k_data_set_description', 'H'),
+        ('vel3d_k_transmit_energy', 'H'),
+        ('vel3d_k_v_scale', 'b'),
+        ('vel3d_k_power_level', 'b'),
+        (None,   'l'),             # unused not included in particle
+        ('vel3d_k_vel0', 'h'),
+        ('vel3d_k_vel1', 'h'),
+        ('vel3d_k_vel2', 'h'),
+        ('vel3d_k_amp0', 'B'),
+        ('vel3d_k_amp1', 'B'),
+        ('vel3d_k_amp2', 'B'),
+        ('vel3d_k_corr0', 'B'),
+        ('vel3d_k_corr1', 'B'),
+        ('vel3d_k_corr2', 'B'),
+        ('vel3d_k_id', 'B')
     ]
 
 DATE_TIME_ARRAY = 'date_time_array'    # This one needs to be special-cased
@@ -172,8 +172,8 @@ class Vel3dKWfpInstrumentParticle(DataParticle):
         #
         data_array = []
         field = 0
-        for x in range(0, len(INSTRUMENT_PARTICLE_KEYS)):
-            key = INSTRUMENT_PARTICLE_KEYS[x]
+        for x in range(0, len(INSTRUMENT_PARTICLE_MAP)):
+            key = INSTRUMENT_PARTICLE_MAP[x](0)
             if key is not None:
                 if key == DATE_TIME_ARRAY:
                     time_array = self.raw_data[field: field + DATE_TIME_SIZE]
